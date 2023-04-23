@@ -40,6 +40,7 @@ TEST(TrieTest, BasicPutGetTest) {
   ASSERT_EQ(*trie.Get<std::string>(""), "empty-key");
 }
 
+
 TEST(TrieTest, PutGetOnePath) {
   auto trie = Trie();
   trie = trie.Put<uint32_t>("111", 111);
@@ -95,6 +96,7 @@ TEST(TrieTest, MismatchTypeTest) {
   trie = trie.Put<uint32_t>("test", 2333);
   ASSERT_EQ(trie.Get<std::string>("test"), nullptr);
 }
+
 
 TEST(TrieTest, CopyOnWriteTest1) {
   auto empty_trie = Trie();

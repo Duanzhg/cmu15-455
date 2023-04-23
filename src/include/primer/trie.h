@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 namespace bustub {
 
@@ -61,7 +62,7 @@ class TrieNode {
   virtual auto Clone() const -> std::unique_ptr<TrieNode> { return std::make_unique<TrieNode>(children_); }
 
   // A map of children, where the key is the next character in the key, and the value is the next TrieNode.
-  std::map<char, std::shared_ptr<const TrieNode>> children_;
+ mutable std::map<char, std::shared_ptr<const TrieNode>> children_;
 
   // Indicates if the node is the terminal node.
   bool is_value_node_{false};
@@ -107,8 +108,11 @@ class Trie {
 
  public:
   // Create an empty trie.
-  Trie() = default;
-
+  //Trie() = default;
+  Trie(){
+    std::cout << "create trieNode" << std::endl;
+    root_ = std::make_shared<const TrieNode>();
+  }
   // Get the value associated with the given key.
   // 1. If the key is not in the trie, return nullptr.
   // 2. If the key is in the trie but the type is mismatched, return nullptr.
