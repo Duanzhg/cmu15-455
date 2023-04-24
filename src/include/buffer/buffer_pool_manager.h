@@ -208,5 +208,9 @@ class BufferPoolManager {
   }
 
   // TODO(student): You may add additional private members and helper functions
+  auto GetPageByFrameId(frame_id_t frameId)-> Page*;
+  auto GetPageByPageId(page_id_t pageId) ->Page*;
+  auto GetPageFromFreeList() ->Page*;
+ // auto GetPageId(frame_id_t frameId) ->page_id_t ;
 };
 }  // namespace bustub
