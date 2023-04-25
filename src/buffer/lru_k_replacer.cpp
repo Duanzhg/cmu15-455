@@ -20,6 +20,7 @@ LRUKReplacer::LRUKReplacer(size_t num_frames, size_t k) : replacer_size_(num_fra
 
 auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
 
+  std::unique_lock<std::mutex> lock(latch_);
   std::cout << "evict..." <<  std::endl;
 
   bool is_inf = false;
@@ -60,6 +61,7 @@ auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
 }
 
 void LRUKReplacer::RecordAccess(frame_id_t frame_id, [[maybe_unused]] AccessType access_type) {
+  std::unique_lock<std::mutex> lock(latch_);
   std::cout << "access frame " << frame_id <<" at timestamp " << current_timestamp_ << std::endl;
   if(frame_id > frame_id_t (replacer_size_)){
     throw Exception(fmt::format("frame_id[{}] is invalid", frame_id));
@@ -78,6 +80,7 @@ void LRUKReplacer::RecordAccess(frame_id_t frame_id, [[maybe_unused]] AccessType
 }
 
 void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {
+  std::unique_lock<std::mutex> lock(latch_);
   std::cout << "set frame " << frame_id << " to " << set_evictable << std::endl;
   if(frame_id > (frame_id_t)replacer_size_){
     throw Exception(fmt::format("frame_id[{}] is invalid", frame_id));
@@ -97,7 +100,7 @@ void LRUKReplacer::SetEvictable(frame_id_t frame_id, bool set_evictable) {
 }
 
 void LRUKReplacer::Remove(frame_id_t frame_id) {
-
+  std::unique_lock<std::mutex> lock(latch_);
   std::cout << "remove frame " << frame_id << std::endl;
   if(frame_id > (frame_id_t)replacer_size_){
     throw Exception(fmt::format("frame_id[{}] is invalid", frame_id));
@@ -108,6 +111,7 @@ void LRUKReplacer::Remove(frame_id_t frame_id) {
 }
 
 auto LRUKReplacer::Size() -> size_t {
+  std::unique_lock<std::mutex> lock(latch_);
   return curr_size_;
 }
 

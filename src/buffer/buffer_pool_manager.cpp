@@ -97,6 +97,7 @@ auto BufferPoolManager::GetPageByPageId(bustub::page_id_t pageId) -> Page * {
   return page;
 }
 auto BufferPoolManager::NewPage(page_id_t *page_id) -> Page * {
+  std::unique_lock<std::mutex> lock(latch_);
   std::cout << "create New page..." << std::endl;
   Page* page = nullptr;
   frame_id_t  frame_id = -1;
@@ -135,6 +136,7 @@ auto BufferPoolManager::NewPage(page_id_t *page_id) -> Page * {
 }
 
 auto BufferPoolManager::FetchPage(page_id_t page_id, [[maybe_unused]] AccessType access_type) -> Page * {
+  std::unique_lock<std::mutex> lock(latch_);
   std::cout << "Fetch page " << page_id << std::endl;
   Page* page = nullptr;
   frame_id_t frame_id = -1;
@@ -169,7 +171,7 @@ auto BufferPoolManager::FetchPage(page_id_t page_id, [[maybe_unused]] AccessType
 }
 
 auto BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty, [[maybe_unused]] AccessType access_type) -> bool {
-
+  std::unique_lock<std::mutex> lock(latch_);
   std::cout << "Unpin page " << page_id << std::endl;
   if(page_table_.find(page_id) == page_table_.end()){
     std::cout << "Page " << page_id << " is not in buffer pool" << std::endl;
@@ -192,6 +194,7 @@ auto BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty, [[maybe_unus
 }
 
 auto BufferPoolManager::FlushPage(page_id_t page_id) -> bool {
+  std::unique_lock<std::mutex> lock(latch_);
   std::cout << "Flush page "<< page_id << std::endl;
   if(page_table_.find(page_id) == page_table_.end()){
     std::cout << "page " << page_id << "is not in buffer pool" << std::endl;
@@ -208,6 +211,7 @@ auto BufferPoolManager::FlushPage(page_id_t page_id) -> bool {
 }
 
 void BufferPoolManager::FlushAllPages() {
+    std::unique_lock<std::mutex> lock(latch_);
     std::cout << "Flush all page" << std::endl;
     for(size_t i=0; i<pool_size_; i++){
       if(pages_[i].page_id_ == INVALID_PAGE_ID){
@@ -220,6 +224,7 @@ void BufferPoolManager::FlushAllPages() {
 }
 
 auto BufferPoolManager::DeletePage(page_id_t page_id) -> bool {
+  std::unique_lock<std::mutex> lock(latch_);
   std::cout << "Delete page " << page_id << std::endl;
   if(page_table_.find(page_id) == page_table_.end()){
       std::cout << "page " << page_id << "is not in buffer pool" << std::endl;
