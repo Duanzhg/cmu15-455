@@ -47,6 +47,7 @@ class BPlusTreeInternalPage : public BPlusTreePage {
    */
   void Init(int max_size = INTERNAL_PAGE_SIZE);
 
+  //void SetComparator(const KeyComparator& comparator);
   /**
    * @param index The index of the key to get. Index must be non-zero.
    * @return Key at index
@@ -71,8 +72,13 @@ class BPlusTreeInternalPage : public BPlusTreePage {
    * @param index the index
    * @return the value at the index
    */
-  auto ValueAt(int index) const -> ValueType;
 
+  auto ValueAt(int index) const -> ValueType;
+  void Insert(KeyComparator comparator,const KeyType& key, const ValueType& value);
+  void Delete(KeyComparator comparator, const KeyType& key);
+  void InsertFirst(const KeyType& key, const ValueType& value);
+  void DeleteFirst();
+  void SetValueAt(int index, const ValueType& value);
   /**
    * @brief For test only, return a string representing all keys in
    * this internal page, formatted as "(key1,key2,key3,...)"
@@ -101,6 +107,8 @@ class BPlusTreeInternalPage : public BPlusTreePage {
 
  private:
   // Flexible array member for page data.
-  MappingType array_[0];
+   MappingType array_[0];
+
+   KeyComparator comparator_;
 };
 }  // namespace bustub

@@ -112,13 +112,16 @@ auto BufferPoolManager::NewPage(page_id_t *page_id) -> Page * {
   if(frame_id == -1 && replacer_->Evict(&frame_id)){
     page = GetPageByFrameId(frame_id);
   //  page_id_t old_page_id = GetPageId(frame_id);
-    disk_manager_->WritePage(page->page_id_, page->data_);
+
+      disk_manager_->WritePage(page->page_id_, page->data_);
+
     page->is_dirty_ = false;
     replacer_->Remove(frame_id);
     page_table_.erase(page->page_id_);
   }
 
   if(frame_id == -1){
+    throw  Exception("frame....");
     std::cout << "Fail to create new page" << std::endl;
     return nullptr;
   }
@@ -139,6 +142,15 @@ auto BufferPoolManager::FetchPage(page_id_t page_id, [[maybe_unused]] AccessType
   std::unique_lock<std::mutex> lock(latch_);
   std::cout << "Fetch page " << page_id << std::endl;
   Page* page = nullptr;
+
+  if(page_table_.find(page_id) != page_table_.end()){
+    page = GetPageByPageId(page_id);
+    //std::cout << page->page_id_ << std::endl;
+    page->pin_count_++;
+    replacer_->RecordAccess(page_table_[page_id]);
+    return page;
+  }
+
   frame_id_t frame_id = -1;
   if(!free_list_.empty()){
     frame_id = free_list_.front();
@@ -184,8 +196,11 @@ auto BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty, [[maybe_unus
     return false;
   }
 
+
+  page->is_dirty_ = true;
   page->pin_count_--;
   if(page->pin_count_ == 0){
+
     replacer_->SetEvictable(page_table_[page_id], true);
   }
 

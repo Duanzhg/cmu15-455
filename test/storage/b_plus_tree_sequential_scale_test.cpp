@@ -27,13 +27,13 @@ using bustub::DiskManagerUnlimitedMemory;
 /**
  * This test should be passing with your Checkpoint 1 submission.
  */
-TEST(BPlusTreeTests, DISABLED_ScaleTest) {  // NOLINT
+TEST(BPlusTreeTests, ScaleTest) {  // NOLINT
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
 
   auto disk_manager = std::make_unique<DiskManagerUnlimitedMemory>();
-  auto *bpm = new BufferPoolManager(30, disk_manager.get());
+  auto *bpm = new BufferPoolManager(100, disk_manager.get());
 
   // create and fetch header_page
   page_id_t page_id;
@@ -47,7 +47,7 @@ TEST(BPlusTreeTests, DISABLED_ScaleTest) {  // NOLINT
   // create transaction
   auto *transaction = new Transaction(0);
 
-  int64_t scale = 5000;
+  int64_t scale = 50000;
   std::vector<int64_t> keys;
   for (int64_t key = 1; key < scale; key++) {
     keys.push_back(key);
@@ -62,6 +62,9 @@ TEST(BPlusTreeTests, DISABLED_ScaleTest) {  // NOLINT
     index_key.SetFromInteger(key);
     tree.Insert(index_key, rid, transaction);
   }
+
+
+
   std::vector<RID> rids;
   for (auto key : keys) {
     rids.clear();
