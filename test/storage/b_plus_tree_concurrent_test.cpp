@@ -128,22 +128,25 @@ TEST(BPlusTreeConcurrentTest, DISABLED_InsertTest1) {
   GenericComparator<8> comparator(key_schema.get());
 
   auto disk_manager = std::make_unique<DiskManagerUnlimitedMemory>();
-  auto *bpm = new BufferPoolManager(50, disk_manager.get());
+  auto *bpm = new BufferPoolManager(30, disk_manager.get());
   // create and fetch header_page
   page_id_t page_id;
   auto header_page = bpm->NewPage(&page_id);
   // create b+ tree
-  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", header_page->GetPageId(), bpm, comparator);
+  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", header_page->GetPageId(), bpm, comparator,2 ,3);
   // keys to Insert
   std::vector<int64_t> keys;
-  int64_t scale_factor = 100;
+  int64_t scale_factor = 20000;
   for (int64_t key = 1; key < scale_factor; key++) {
     keys.push_back(key);
   }
   LaunchParallelTest(2, InsertHelper, &tree, keys);
 
+
   std::vector<RID> rids;
   GenericKey<8> index_key;
+
+
   for (auto key : keys) {
     rids.clear();
     index_key.SetFromInteger(key);
@@ -154,6 +157,8 @@ TEST(BPlusTreeConcurrentTest, DISABLED_InsertTest1) {
     EXPECT_EQ(rids[0].GetSlotNum(), value);
   }
 
+
+
   int64_t start_key = 1;
   int64_t current_key = start_key;
   index_key.SetFromInteger(start_key);
@@ -161,6 +166,8 @@ TEST(BPlusTreeConcurrentTest, DISABLED_InsertTest1) {
     auto location = (*iterator).second;
     EXPECT_EQ(location.GetPageId(), 0);
     EXPECT_EQ(location.GetSlotNum(), current_key);
+    //int64_t value = current_key & 0xFFFFFFFF;
+    //EXPECT_EQ(location.GetSlotNum(), value);
     current_key = current_key + 1;
   }
 
@@ -175,15 +182,15 @@ TEST(BPlusTreeConcurrentTest, DISABLED_InsertTest2) {
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
   auto disk_manager = std::make_unique<DiskManagerUnlimitedMemory>();
-  auto *bpm = new BufferPoolManager(50, disk_manager.get());
+  auto *bpm = new BufferPoolManager(30, disk_manager.get());
   // create and fetch header_page
   page_id_t page_id;
   auto header_page = bpm->NewPage(&page_id);
   // create b+ tree
-  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", header_page->GetPageId(), bpm, comparator);
+  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", header_page->GetPageId(), bpm, comparator,2,3);
   // keys to Insert
   std::vector<int64_t> keys;
-  int64_t scale_factor = 100;
+  int64_t scale_factor = 20000;
   for (int64_t key = 1; key < scale_factor; key++) {
     keys.push_back(key);
   }
@@ -217,7 +224,7 @@ TEST(BPlusTreeConcurrentTest, DISABLED_InsertTest2) {
   delete bpm;
 }
 
-TEST(BPlusTreeConcurrentTest, DISABLED_DeleteTest1) {
+TEST(BPlusTreeConcurrentTest, DeleteTest1) {
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
@@ -256,7 +263,7 @@ TEST(BPlusTreeConcurrentTest, DISABLED_DeleteTest1) {
   delete bpm;
 }
 
-TEST(BPlusTreeConcurrentTest, DISABLED_DeleteTest2) {
+TEST(BPlusTreeConcurrentTest,DeleteTest2) {
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
@@ -295,7 +302,7 @@ TEST(BPlusTreeConcurrentTest, DISABLED_DeleteTest2) {
   delete bpm;
 }
 
-TEST(BPlusTreeConcurrentTest, DISABLED_MixTest1) {
+TEST(BPlusTreeConcurrentTest, MixTest1) {
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
@@ -336,7 +343,7 @@ TEST(BPlusTreeConcurrentTest, DISABLED_MixTest1) {
   delete bpm;
 }
 
-TEST(BPlusTreeConcurrentTest, DISABLED_MixTest2) {
+TEST(BPlusTreeConcurrentTest, MixTest2) {
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
@@ -350,12 +357,12 @@ TEST(BPlusTreeConcurrentTest, DISABLED_MixTest2) {
   (void)header_page;
 
   // create b+ tree
-  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", page_id, bpm, comparator);
+  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", page_id, bpm, comparator, 2 ,3);
 
   // Add perserved_keys
   std::vector<int64_t> perserved_keys;
   std::vector<int64_t> dynamic_keys;
-  int64_t total_keys = 50;
+  int64_t total_keys = 50000;
   int64_t sieve = 5;
   for (int64_t i = 1; i <= total_keys; i++) {
     if (i % sieve == 0) {

@@ -31,6 +31,7 @@ auto LRUKReplacer::Evict(frame_id_t *frame_id) -> bool {
   //使用lruk算法淘汰一个节点
   for(auto iter = node_store_.begin(); iter != node_store_.end(); iter++){
     if(!iter->second.is_evictable_){
+
       continue ;
     }
 
@@ -72,9 +73,11 @@ void LRUKReplacer::RecordAccess(frame_id_t frame_id, [[maybe_unused]] AccessType
     auto node = LRUKNode();
     node.fid_ = frame_id;
     node.k_ = k_;
+    node.is_evictable_ = false;
     node_store_[frame_id] = node ;
 
   }
+  node_store_[frame_id].is_evictable_ = false;
   node_store_[frame_id].history_.push_front(current_timestamp_);
   current_timestamp_++;
 }

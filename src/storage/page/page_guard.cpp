@@ -62,7 +62,8 @@ auto ReadPageGuard::operator=(ReadPageGuard &&that) noexcept -> ReadPageGuard & 
 
 void ReadPageGuard::Drop() {
     if(guard_.bpm_ != nullptr && guard_.page_ != nullptr){
-        //guard_.page_->RUnlatch();
+        guard_.page_->RUnlatch();
+        std::cout << "RUnLatch page " << PageId() << std::endl;
     }
 }
 
@@ -85,7 +86,9 @@ auto WritePageGuard::operator=(WritePageGuard &&that) noexcept -> WritePageGuard
 
 void WritePageGuard::Drop() {
     if(guard_.bpm_ != nullptr && guard_.page_ != nullptr){
-        //guard_.page_->WUnlatch();
+        guard_.page_->WUnlatch();
+        std::cout << "WUnlatch page " <<  PageId() << std::endl;
+        guard_.Drop();
     }
 }
 

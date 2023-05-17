@@ -114,12 +114,13 @@ auto BufferPoolManager::NewPage(page_id_t *page_id) -> Page * {
   if(frame_id == -1 && replacer_->Evict(&frame_id)){
     page = GetPageByFrameId(frame_id);
   //  page_id_t old_page_id = GetPageId(frame_id);
-    //disk_manager_->WritePage(page->page_id_, page->data_);
+    disk_manager_->WritePage(page->page_id_, page->data_);
+    /*
     if(page->is_dirty_){
       disk_manager_->WritePage(page->page_id_, page->data_);
       page->is_dirty_ = false;
     }
-
+    */
     replacer_->Remove(frame_id);
     page_table_.erase(page->page_id_);
   }
@@ -169,11 +170,13 @@ auto BufferPoolManager::FetchPage(page_id_t page_id, [[maybe_unused]] AccessType
   if(frame_id == -1 && replacer_->Evict(&frame_id)){
     page = GetPageByFrameId(frame_id);
  //   page_id_t old_page_id = GetPageId(frame_id);
-    //disk_manager_->WritePage(page->page_id_, page->data_);
+    disk_manager_->WritePage(page->page_id_, page->data_);
+    /*
     if(page->is_dirty_){
       disk_manager_->WritePage(page->page_id_, page->data_);
       page->is_dirty_ = false;
     }
+     */
     replacer_->Remove(frame_id);
     page_table_.erase(page->page_id_);
   }
@@ -209,9 +212,12 @@ auto BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty, [[maybe_unus
     return false;
   }
 
+  /*
   if(is_dirty){
       page->is_dirty_ = is_dirty;
-  }
+  }*/
+  //todo ....
+  page->is_dirty_ = true;
   page->pin_count_--;
   if(page->pin_count_ == 0){
     replacer_->SetEvictable(page_table_[page_id], true);
@@ -280,11 +286,19 @@ auto BufferPoolManager::FetchPageBasic(page_id_t page_id) -> BasicPageGuard {
 
 auto BufferPoolManager::FetchPageRead(page_id_t page_id) -> ReadPageGuard {
 
-  return {this, FetchPage(page_id)};
+   Page* page = FetchPage(page_id);
+   std::cout << "RLatch page " << page_id << std::endl;
+   page->RLatch();
+   return { this, page};
+  //return {this, FetchPage(page_id)};
 }
 
 auto BufferPoolManager::FetchPageWrite(page_id_t page_id) -> WritePageGuard {
-  return {this, FetchPage(page_id)};
+    Page* page = FetchPage(page_id);
+    page->WLatch();
+    std::cout << "WLatch page " << page_id << std::endl;
+    return {this, page};
+   //return {this, FetchPage(page_id)};
 }
 
 auto BufferPoolManager::NewPageGuarded(page_id_t *page_id) -> BasicPageGuard {

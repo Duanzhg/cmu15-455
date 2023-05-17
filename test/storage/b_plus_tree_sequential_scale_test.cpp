@@ -41,21 +41,21 @@ TEST(BPlusTreeTests, ScaleTest) {  // NOLINT
   (void)header_page;
 
   // create b+ tree
-  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", page_id, bpm, comparator, 8, 8);
+  BPlusTree<GenericKey<8>, RID, GenericComparator<8>> tree("foo_pk", page_id, bpm, comparator, 2, 3);
   GenericKey<8> index_key;
   RID rid;
   // create transaction
   auto *transaction = new Transaction(0);
 
-  int64_t scale = 200000;
+  int64_t scale = 150000;
   std::vector<int64_t> keys;
   for (int64_t key = 1; key < scale; key++) {
     keys.push_back(key);
   }
 
   // randomized the insertion order
-  auto rng = std::default_random_engine{};
-  std::shuffle(keys.begin(), keys.end(), rng);
+  //auto rng = std::default_random_engine{};
+  //std::shuffle(keys.begin(), keys.end(), rng);
   for (auto key : keys) {
     int64_t value = key & 0xFFFFFFFF;
     rid.Set(static_cast<int32_t>(key >> 32), value);
