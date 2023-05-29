@@ -9,6 +9,7 @@ BasicPageGuard::BasicPageGuard(BasicPageGuard &&that) noexcept {
     page_ = that.page_;
     is_dirty_ = that.is_dirty_;
 
+
     that.bpm_ = nullptr;
     that.page_ = nullptr;
     that.is_dirty_ = false;
@@ -81,6 +82,7 @@ auto WritePageGuard::operator=(WritePageGuard &&that) noexcept -> WritePageGuard
 
     Drop();
     guard_ = std::move(that.guard_);
+
     return *this;
 }
 
@@ -89,10 +91,13 @@ void WritePageGuard::Drop() {
         guard_.page_->WUnlatch();
         std::cout << "WUnlatch page " <<  PageId() << std::endl;
         guard_.Drop();
+
     }
 }
 
 WritePageGuard::~WritePageGuard() {
+
     Drop();
+
 }  // NOLINT
 }  // namespace bustub

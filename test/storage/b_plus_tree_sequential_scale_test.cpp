@@ -33,7 +33,7 @@ TEST(BPlusTreeTests, ScaleTest) {  // NOLINT
   GenericComparator<8> comparator(key_schema.get());
 
   auto disk_manager = std::make_unique<DiskManagerUnlimitedMemory>();
-  auto *bpm = new BufferPoolManager(30, disk_manager.get());
+  auto *bpm = new BufferPoolManager(100, disk_manager.get());
 
   // create and fetch header_page
   page_id_t page_id;
@@ -46,6 +46,7 @@ TEST(BPlusTreeTests, ScaleTest) {  // NOLINT
   RID rid;
   // create transaction
   auto *transaction = new Transaction(0);
+
 
   int64_t scale = 150000;
   std::vector<int64_t> keys;
@@ -62,6 +63,9 @@ TEST(BPlusTreeTests, ScaleTest) {  // NOLINT
     index_key.SetFromInteger(key);
     tree.Insert(index_key, rid, transaction);
   }
+
+
+
   std::vector<RID> rids;
   for (auto key : keys) {
     rids.clear();

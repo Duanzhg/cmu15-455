@@ -10,7 +10,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "storage/page/b_plus_tree_page.h"
-
 namespace bustub {
 
 /*
@@ -18,10 +17,12 @@ namespace bustub {
  * Page type enum class is defined in b_plus_tree_page.h
  */
 auto BPlusTreePage::IsLeafPage() const -> bool {
+
   if(page_type_ == IndexPageType::LEAF_PAGE){
     return true;
   }
   return false;
+
 }
 void BPlusTreePage::SetPageType(IndexPageType page_type) {
   page_type_ = page_type;
@@ -38,6 +39,7 @@ void BPlusTreePage::SetSize(int size) {
   size_ = size;
 }
 
+
 void BPlusTreePage::IncreaseSize(int amount) {
   size_ += amount;
 }
@@ -47,6 +49,8 @@ void BPlusTreePage::IncreaseSize(int amount) {
  */
 auto BPlusTreePage::GetMaxSize() const -> int {
   return max_size_;
+
+
 }
 void BPlusTreePage::SetMaxSize(int size) {
   max_size_ = size;
@@ -57,12 +61,14 @@ void BPlusTreePage::SetMaxSize(int size) {
  * Generally, min page size == max page size / 2
  */
 auto BPlusTreePage::GetMinSize() const -> int {
+
   /*
   if(page_type_ == IndexPageType::LEAF_PAGE){
     return max_size_/2;
   }
    */
   return (max_size_+1)/2;
+
 }
 
 }  // namespace bustub

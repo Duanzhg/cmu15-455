@@ -5,7 +5,7 @@
 #include "common/logger.h"
 #include "common/rid.h"
 #include "storage/index/b_plus_tree.h"
-
+#include <iostream>
 namespace bustub {
 
 INDEX_TEMPLATE_ARGUMENTS
@@ -27,10 +27,12 @@ BPLUSTREE_TYPE::BPlusTree(std::string name, page_id_t header_page_id, BufferPool
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::IsEmpty() const -> bool {
+
   auto header_guard = bpm_->FetchPageWrite(header_page_id_);
   auto header_page = header_guard.As<BPlusTreeHeaderPage>();
 
   return header_page->root_page_id_ == INVALID_PAGE_ID;
+
 }
 /*****************************************************************************
  * SEARCH
@@ -48,6 +50,7 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
   // Declaration of context instance.
   Context ctx;
   (void)ctx;
+
 
   page_id_t root_page_id = GetRootPageId();
   auto curr_page_guard = bpm_->FetchPageRead(root_page_id);
@@ -72,6 +75,7 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
   if(index != -1){
     result->push_back(leaf_page->ValueAt(index));
     return true;
+
   }
   return false;
 }
@@ -89,10 +93,12 @@ auto BPLUSTREE_TYPE::GetValue(const KeyType &key, std::vector<ValueType> *result
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transaction *txn) -> bool {
 
+
   std::cout << "insert key: " << key << ", value: " << value << std::endl;
   // Declaration of context instance.
   Context ctx;
   //(void)ctx;
+
 
   ctx.header_page_ = bpm_->FetchPageWrite(header_page_id_);
   auto header_page = ctx.header_page_->AsMut<BPlusTreeHeaderPage>();
@@ -320,7 +326,10 @@ void BPLUSTREE_TYPE::InsertIntoParent(Context &context, const bustub::page_id_t 
         InsertIntoParent(context, parent_page_id, new_internal_page->KeyAt(0), new_internal_page_id);
 
     }
+
 }
+
+
 
 /*****************************************************************************
  * REMOVE
@@ -335,7 +344,9 @@ void BPLUSTREE_TYPE::InsertIntoParent(Context &context, const bustub::page_id_t 
 INDEX_TEMPLATE_ARGUMENTS
 void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *txn) {
   // Declaration of context instance.
+ std::cout << "==remove key: " << key << std::endl;
   Context ctx;
+
   //(void)ctx;
   std::cout << "remove key: " << key << std::endl;
   ctx.header_page_ = bpm_->FetchPageWrite(header_page_id_);
@@ -581,6 +592,7 @@ void BPLUSTREE_TYPE::RemoveEntry(bustub::Context &context, const bustub::page_id
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::Begin() -> INDEXITERATOR_TYPE {
 
+
   page_id_t root_page_id = GetRootPageId();
   auto curr_page_guard = bpm_->FetchPageRead(root_page_id);
   auto curr_page = curr_page_guard.As<BPlusTreePage>();
@@ -603,6 +615,7 @@ auto BPLUSTREE_TYPE::Begin() -> INDEXITERATOR_TYPE {
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::Begin(const KeyType &key) -> INDEXITERATOR_TYPE {
 
+
     page_id_t root_page_id = GetRootPageId();
     auto curr_page_guard = bpm_->FetchPageRead(root_page_id);
     auto curr_page = curr_page_guard.As<BPlusTreePage>();
@@ -620,6 +633,7 @@ auto BPLUSTREE_TYPE::Begin(const KeyType &key) -> INDEXITERATOR_TYPE {
     }
 
     return INDEXITERATOR_TYPE(bpm_, curr_page_guard.PageId(), index);
+
 }
 
 /*
@@ -629,7 +643,9 @@ auto BPLUSTREE_TYPE::Begin(const KeyType &key) -> INDEXITERATOR_TYPE {
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::End() -> INDEXITERATOR_TYPE {
+
     return INDEXITERATOR_TYPE(true);
+
 }
 
 /**
@@ -637,8 +653,10 @@ auto BPLUSTREE_TYPE::End() -> INDEXITERATOR_TYPE {
  */
 INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::GetRootPageId() -> page_id_t {
+
   auto header_guard = bpm_->FetchPageWrite(header_page_id_);
   auto header_page = header_guard.As<BPlusTreeHeaderPage>();
+
   return header_page->root_page_id_;
 }
 

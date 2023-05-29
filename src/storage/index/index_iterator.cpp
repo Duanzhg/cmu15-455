@@ -25,6 +25,7 @@ INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE::~IndexIterator() = default;  // NOLINT
 
 INDEX_TEMPLATE_ARGUMENTS
+
 auto INDEXITERATOR_TYPE::IsEnd() -> bool {
     //throw std::runtime_error("unimplemented");
     return is_end_ == true;
@@ -58,6 +59,7 @@ auto INDEXITERATOR_TYPE::operator++() -> INDEXITERATOR_TYPE & {
     }
 
     return *this;
+
 
 }
 

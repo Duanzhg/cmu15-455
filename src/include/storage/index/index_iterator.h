@@ -28,11 +28,14 @@ class IndexIterator {
   IndexIterator();
   ~IndexIterator();  // NOLINT
 
+  //IndexIterator(BufferPoolManager* bpm, const page_id_t page_id, const int index);
+  //IndexIterator(bool is_end);
   auto IsEnd() -> bool;
 
   auto operator*() -> const MappingType &;
 
   auto operator++() -> IndexIterator &;
+
 
   auto operator==(const IndexIterator &itr) const -> bool {
     //throw std::runtime_error("unimplemented");
@@ -50,12 +53,16 @@ class IndexIterator {
 
   auto operator!=(const IndexIterator &itr) const -> bool {
     //throw std::runtime_error("unimplemented");
+
+
     return !(*this == itr);
   }
 
  private:
   // add your own private member variables here
+
   BufferPoolManager *bpm_;
+
   ReadPageGuard guard_;
   page_id_t page_id_;
   int index_;

@@ -153,7 +153,9 @@ class WritePageGuard {
  public:
   WritePageGuard() = default;
   WritePageGuard(BufferPoolManager *bpm, Page *page) : guard_(bpm, page) {
+
     //guard_.page_->WUnlatch();
+
   }
   WritePageGuard(const WritePageGuard &) = delete;
   auto operator=(const WritePageGuard &) -> WritePageGuard & = delete;
@@ -197,7 +199,9 @@ class WritePageGuard {
    */
   ~WritePageGuard();
 
-  auto PageId() -> page_id_t { return guard_.PageId(); }
+  auto PageId() -> page_id_t {
+    return guard_.PageId();
+  }
 
   auto GetData() -> const char * { return guard_.GetData(); }
 
