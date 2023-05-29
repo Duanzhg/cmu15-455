@@ -29,6 +29,7 @@ class BPlusTreeIndex : public Index {
  public:
   BPlusTreeIndex(std::unique_ptr<IndexMetadata> &&metadata, BufferPoolManager *buffer_pool_manager);
 
+  //BPlusTreeIndex(IndexIterator<8>, GenericKey<RID, GenericComparator> iterator);
   auto InsertEntry(const Tuple &key, RID rid, Transaction *transaction) -> bool override;
 
   void DeleteEntry(const Tuple &key, RID rid, Transaction *transaction) override;

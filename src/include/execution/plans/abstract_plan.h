@@ -19,6 +19,7 @@
 
 #include "catalog/schema.h"
 #include "fmt/format.h"
+#include "common/util/hash_util.h"
 
 namespace bustub {
 

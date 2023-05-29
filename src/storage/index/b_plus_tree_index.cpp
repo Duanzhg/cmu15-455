@@ -28,8 +28,8 @@ INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_INDEX_TYPE::InsertEntry(const Tuple &key, RID rid, Transaction *transaction) -> bool {
   // construct insert index key
   KeyType index_key;
-  index_key.SetFromKey(key);
 
+  index_key.SetFromKey(key);
   return container_->Insert(index_key, rid, transaction);
 }
 

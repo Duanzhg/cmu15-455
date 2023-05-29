@@ -18,7 +18,7 @@ yarkhinephyo Wednesday Wednesday 1
 # The real test begins...
 
 query rowsort +ensure:nlj_init_check
-select * from test_simple_seq_1 s1 inner join test_simple_seq_2 s2 on s1.col1 + 5 = s2.col1;
+select * from test_simple_seq_1 s1 inner join test_simple_seq_2 s2 on s1.col1+5 = s2.col1;
 ----
 0 5 15
 1 6 16
@@ -388,7 +388,7 @@ statement ok
 create table t3(v1 int, v2 int);
 
 statement ok
-insert into t3 values 
+insert into t3 values
     (0, 1),
     (1, 1),
     (2, 1),

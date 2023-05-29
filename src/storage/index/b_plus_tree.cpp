@@ -415,6 +415,7 @@ void BPLUSTREE_TYPE::RemoveEntry(bustub::Context &context, const bustub::page_id
             //auto header_page = header_page_guard.AsMut<BPlusTreeHeaderPage>();
 
             header_page->root_page_id_ = INVALID_PAGE_ID;
+
         }
 
         return;
@@ -582,6 +583,10 @@ INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::Begin() -> INDEXITERATOR_TYPE {
 
   page_id_t root_page_id = GetRootPageId();
+  //当b+树为空树时，返回end();
+  if(root_page_id == INVALID_PAGE_ID){
+        return End();
+  }
   auto curr_page_guard = bpm_->FetchPageRead(root_page_id);
   auto curr_page = curr_page_guard.As<BPlusTreePage>();
 
@@ -604,10 +609,18 @@ INDEX_TEMPLATE_ARGUMENTS
 auto BPLUSTREE_TYPE::Begin(const KeyType &key) -> INDEXITERATOR_TYPE {
 
     page_id_t root_page_id = GetRootPageId();
+    //当b+树为空树时，返回end();
+    if(root_page_id == INVALID_PAGE_ID){
+      throw Exception("empty");
+      return End();
+    }
     auto curr_page_guard = bpm_->FetchPageRead(root_page_id);
     auto curr_page = curr_page_guard.As<BPlusTreePage>();
 
+
+
     while(!curr_page->IsLeafPage()){
+      std::cout << "%%%%%%%%%%%%%%%%%%%%%%%" << std::endl;
         const InternalPage *temp_page = curr_page_guard.As<InternalPage>();
         curr_page_guard = bpm_->FetchPageRead(temp_page->ValueAt(0));
         curr_page = curr_page_guard.As<BPlusTreePage>();

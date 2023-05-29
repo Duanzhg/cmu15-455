@@ -64,6 +64,7 @@ void ReadPageGuard::Drop() {
     if(guard_.bpm_ != nullptr && guard_.page_ != nullptr){
         guard_.page_->RUnlatch();
         std::cout << "RUnLatch page " << PageId() << std::endl;
+        guard_.Drop();
     }
 }
 

@@ -80,4 +80,39 @@ class HashJoinPlanNode : public AbstractPlanNode {
   auto PlanNodeToString() const -> std::string override;
 };
 
+struct JoinKey{
+
+  std::vector<Value> keys_;
+
+  auto operator==(const JoinKey& other) const -> bool{
+      for(size_t i=0; i<keys_.size(); i++){
+          if(keys_[i].CompareEquals(other.keys_[i]) != CmpBool::CmpTrue){
+              return false;
+          }
+      }
+      return true;
+  }
+};
+
+struct JoinValue{
+  Tuple value;
+};
+
 }  // namespace bustub
+
+namespace std {
+
+/** Implements std::hash on AggregateKey */
+template <>
+  struct hash<bustub::JoinKey> {
+    auto operator()(const bustub::JoinKey &join_key) const -> std::size_t {
+      size_t curr_hash = 0;
+      for (const auto &key : join_key.keys_) {
+        if (!key.IsNull()) {
+          curr_hash = bustub::HashUtil::CombineHashes(curr_hash, bustub::HashUtil::HashValue(&key));
+        }
+      }
+      return curr_hash;
+    }
+  };
+}

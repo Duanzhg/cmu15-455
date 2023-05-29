@@ -67,17 +67,66 @@ class SimpleAggregationHashTable {
    * TODO(Student)
    *
    * Combines the input into the aggregation result.
-   * @param[out] result The output aggregate value
+* @param[out] result The output aggregate value
    * @param input The input value
    */
   void CombineAggregateValues(AggregateValue *result, const AggregateValue &input) {
+    //处理数据表中字段为空的情况。
     for (uint32_t i = 0; i < agg_exprs_.size(); i++) {
       switch (agg_types_[i]) {
         case AggregationType::CountStarAggregate:
+            if(flag_ == 1){
+              result->aggregates_[i] = result->aggregates_[i].Add(Value(TypeId::INTEGER, 1));
+            }
+            //std::cout << result->aggregates_[i].GetAs<int>() << std::endl;
+            break ;
         case AggregationType::CountAggregate:
+            if(input.aggregates_[i].IsNull()){
+              continue ;
+            }
+
+            if(result->aggregates_[i].IsNull()){
+                result->aggregates_[i] = Value(TypeId::INTEGER, 1);
+            } else{
+                result->aggregates_[i] = result->aggregates_[i].Add(Value(TypeId::INTEGER, 1));
+            }
+
+            break ;
         case AggregationType::SumAggregate:
+            if(input.aggregates_[i].IsNull()){
+                continue ;
+            }
+            if(result->aggregates_[i].IsNull()){
+                std::cout << input.aggregates_[i].GetAs<int>() << std::endl;
+                result->aggregates_[i] = input.aggregates_[i];
+            }else{
+                std::cout << input.aggregates_[i].GetAs<int>() << " " << result->aggregates_[i].GetAs<int>() << std::endl;
+                result->aggregates_[i] = result->aggregates_[i].Add(input.aggregates_[i]);
+            }
+
+            break ;
         case AggregationType::MinAggregate:
+            if(input.aggregates_[i].IsNull()){
+                continue ;
+            }
+
+            if(result->aggregates_[i].IsNull()){
+                result->aggregates_[i] = input.aggregates_[i];
+            }else{
+                result->aggregates_[i] = result->aggregates_[i].Min(input.aggregates_[i]);
+            }
+
+            break ;
         case AggregationType::MaxAggregate:
+            if(input.aggregates_[i].IsNull()){
+                continue ;
+            }
+            if(result->aggregates_[i].IsNull()){
+                result->aggregates_[i] = input.aggregates_[i];
+            }else{
+                result->aggregates_[i] = result->aggregates_[i].Max(input.aggregates_[i]);
+            }
+
           break;
       }
     }
@@ -95,6 +144,10 @@ class SimpleAggregationHashTable {
     CombineAggregateValues(&ht_[agg_key], agg_val);
   }
 
+
+  void SetFlag(int flag){
+      flag_ = flag;
+  }
   /**
    * Clear the hash table
    */
@@ -135,6 +188,7 @@ class SimpleAggregationHashTable {
   /** @return Iterator to the end of the hash table */
   auto End() -> Iterator { return Iterator{ht_.cend()}; }
 
+
  private:
   /** The hash table is just a map from aggregate keys to aggregate values */
   std::unordered_map<AggregateKey, AggregateValue> ht_{};
@@ -142,6 +196,8 @@ class SimpleAggregationHashTable {
   const std::vector<AbstractExpressionRef> &agg_exprs_;
   /** The types of aggregations that we have */
   const std::vector<AggregationType> &agg_types_;
+
+  int flag_;
 };
 
 /**
@@ -204,5 +260,9 @@ class AggregationExecutor : public AbstractExecutor {
   // TODO(Student): Uncomment SimpleAggregationHashTable aht_;
   /** Simple aggregation hash table iterator */
   // TODO(Student): Uncomment SimpleAggregationHashTable::Iterator aht_iterator_;
+
+  SimpleAggregationHashTable aht_;
+  SimpleAggregationHashTable::Iterator* aht_iterator;
+
 };
 }  // namespace bustub

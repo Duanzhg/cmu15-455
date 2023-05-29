@@ -6,7 +6,7 @@
 query rowsort +ensure:hash_join
 select * from
     __mock_table_tas_2023 inner join __mock_table_schedule_2023
-    on office_hour = day_of_week
+    on    day_of_week = office_hour
     where has_lecture = 1;
 ----
 David-Lyons Monday Monday 1 
@@ -526,7 +526,7 @@ select * from temp_1 t1 inner join temp_2 t2 on t1.colC = t2.colB and t1.colB = 
 
 # Switch left and right table column expressions
 query rowsort +ensure:hash_join
-select * from temp_1 t1 inner join temp_2 t2 on t1.colB = t2.colA and t2.colC = t1.colA ;
+select * from temp_1 t1 inner join temp_2 t2 on t1.colB = t2.colA and  t2.colC = t1.colA  ;
 ----
 8 8 3074 56174 8 194 8
 

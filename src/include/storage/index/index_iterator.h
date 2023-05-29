@@ -26,6 +26,7 @@ class IndexIterator {
   IndexIterator(bool is_end);
   IndexIterator(BufferPoolManager *bpm, const page_id_t page_id, const int index);
   IndexIterator();
+  IndexIterator(IndexIterator&& ) = default;
   ~IndexIterator();  // NOLINT
 
   auto IsEnd() -> bool;

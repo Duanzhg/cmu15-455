@@ -32,6 +32,8 @@ class GenericKey {
   inline void SetFromKey(const Tuple &tuple) {
     // intialize to 0
     memset(data_, 0, KeySize);
+    //std::cout << tuple.GetLength() << std::endl;
+    //std::cout << KeySize << std::endl;
     memcpy(data_, tuple.GetData(), tuple.GetLength());
   }
 
