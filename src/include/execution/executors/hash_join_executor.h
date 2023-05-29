@@ -36,7 +36,6 @@ class SimpleJoinHashTable{
     }
 
     auto Count(const JoinKey& join_key)-> bool {
-        std::cout << ht_.count(join_key) << std::endl;
         return ht_.count(join_key) != 0;
     }
 

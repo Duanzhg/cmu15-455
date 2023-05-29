@@ -25,13 +25,14 @@ void SeqScanExecutor::Init() {
     auto table_oid = plan_->GetTableOid();
     auto table_info = GetExecutorContext()->GetCatalog()->GetTable(table_oid);
 
-    iter_ = new TableIterator(table_info->table_->MakeIterator());
+    //iter_ = new TableIterator(table_info->table_->MakeIterator());
+    iter_ = std::make_unique<TableIterator>(table_info->table_->MakeIterator());
 }
 
 auto SeqScanExecutor::Next(Tuple *tuple, RID *rid) -> bool {
     while(true){
         if(iter_->IsEnd()){
-          delete iter_;
+          //delete iter_;
           return false;
         }
 

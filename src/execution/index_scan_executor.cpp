@@ -24,7 +24,6 @@ void IndexScanExecutor::Init() {
 }
 
 auto IndexScanExecutor::Next(Tuple *tuple, RID *rid) -> bool {
-    std::cout << "===========" << std::endl;
     if(iter_->IsEnd()){
         delete iter_;
         return false;
