@@ -297,10 +297,14 @@ class LockManager {
    * Runs cycle detection in the background.
    */
   auto RunCycleDetection() -> void;
-
+  void Print();
   TransactionManager *txn_manager_;
 
  private:
+  auto  GrandLock(std::shared_ptr<LockRequestQueue> queue, LockRequest* lock_request) -> bool;
+  auto  GrandRowLock(std::shared_ptr<LockRequestQueue> queue, LockRequest* lock_request) -> bool;
+  auto hasCycle(txn_id_t begin_txn_id, txn_id_t *txn_id) ->bool;
+
   /** Fall 2022 */
   /** Structure that holds lock requests for a given table oid */
   std::unordered_map<table_oid_t, std::shared_ptr<LockRequestQueue>> table_lock_map_;
@@ -317,6 +321,8 @@ class LockManager {
   /** Waits-for graph representation. */
   std::unordered_map<txn_id_t, std::vector<txn_id_t>> waits_for_;
   std::mutex waits_for_latch_;
+
+  std::unordered_map<txn_id_t, bool> visited_;
 };
 
 }  // namespace bustub

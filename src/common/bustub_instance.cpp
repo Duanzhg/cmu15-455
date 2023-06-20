@@ -109,7 +109,6 @@ BustubInstance::BustubInstance() {
 #endif
 
   txn_manager_ = new TransactionManager(lock_manager_, log_manager_);
-
   lock_manager_->txn_manager_ = txn_manager_;
 
   // Checkpoint related.

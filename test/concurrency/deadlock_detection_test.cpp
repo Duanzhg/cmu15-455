@@ -21,7 +21,7 @@
       << "Test Failed Due to Time Out";
 
 namespace bustub {
-TEST(LockManagerDeadlockDetectionTest, DISABLED_EdgeTest) {
+TEST(LockManagerDeadlockDetectionTest, EdgeTest) {
   LockManager lock_mgr{};
 
   const int num_nodes = 100;
@@ -58,12 +58,14 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_EdgeTest) {
   std::sort(lock_mgr_edges.begin(), lock_mgr_edges.end());
   std::sort(edges.begin(), edges.end());
 
+
+  //lock_mgr.Print();
   for (int i = 0; i < num_edges; i++) {
     EXPECT_EQ(edges[i], lock_mgr_edges[i]);
   }
 }
 
-TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
+TEST(LockManagerDeadlockDetectionTest, BasicDeadlockDetectionTest) {
   LockManager lock_mgr{};
   TransactionManager txn_mgr{&lock_mgr};
 
@@ -92,8 +94,10 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
     lock_mgr.UnlockRow(txn0, toid, rid0);
     lock_mgr.UnlockTable(txn0, toid);
 
+
     txn_mgr.Commit(txn0);
     EXPECT_EQ(TransactionState::COMMITTED, txn0->GetState());
+
   });
 
   std::thread t1([&] {
@@ -104,6 +108,7 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
 
     res = lock_mgr.LockRow(txn1, LockManager::LockMode::EXCLUSIVE, toid, rid1);
     EXPECT_EQ(TransactionState::GROWING, txn1->GetState());
+
 
     // This will block
     res = lock_mgr.LockRow(txn1, LockManager::LockMode::EXCLUSIVE, toid, rid0);
@@ -118,7 +123,6 @@ TEST(LockManagerDeadlockDetectionTest, DISABLED_BasicDeadlockDetectionTest) {
 
   t0.join();
   t1.join();
-
   delete txn0;
   delete txn1;
 }
