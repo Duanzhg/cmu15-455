@@ -13,7 +13,7 @@
 #include <memory>
 
 #include "execution/executors/insert_executor.h"
-
+#include "concurrency/transaction_manager.h"
 namespace bustub {
 
 InsertExecutor::InsertExecutor(ExecutorContext *exec_ctx, const InsertPlanNode *plan,
@@ -30,18 +30,34 @@ void InsertExecutor::Init() {
     Tuple child_tuple;
     RID  child_rid;
     auto table_oid = plan_->TableOid();
+    try{
+        bool is_success = exec_ctx_->GetLockManager()->LockTable(exec_ctx_->GetTransaction(), LockManager::LockMode::INTENTION_EXCLUSIVE, table_oid);
+        if(!is_success){
+            throw ExecutionException("fail lock table in select");
+        }
+    }catch(TransactionAbortException &e){
+        exec_ctx_->GetTransactionManager()->Abort(exec_ctx_->GetTransaction());
+    }
+
     auto table_info = exec_ctx_->GetCatalog()->GetTable(table_oid);
     auto index_infos = exec_ctx_->GetCatalog()->GetTableIndexes(table_info->name_);
+
+
 
     while(child_executor_->Next(&child_tuple, &child_rid)){
         insert_rows_++;
 
-
         TupleMeta meta;
         meta.is_deleted_ = false;
         auto rid = table_info->table_->InsertTuple(meta, child_tuple);
-
-
+        try{
+            bool is_success = exec_ctx_->GetLockManager()->LockRow(exec_ctx_->GetTransaction(), LockManager::LockMode::EXCLUSIVE, table_oid, *rid);
+            if(!is_success){
+                throw ExecutionException("fail lock row in select");
+            }
+        }catch(TransactionAbortException &e){
+            exec_ctx_->GetTransactionManager()->Abort(exec_ctx_->GetTransaction());
+        }
         for(auto index_info : index_infos){
             //std::cout << index_infos.size() << std::endl;
             //std::cout << child_tuple.ToString(&index_info->key_schema_) << std::endl;

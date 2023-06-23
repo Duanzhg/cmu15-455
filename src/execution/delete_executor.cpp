@@ -13,7 +13,7 @@
 #include <memory>
 
 #include "execution/executors/delete_executor.h"
-
+#include "concurrency/transaction_manager.h"
 namespace bustub {
 
 DeleteExecutor::DeleteExecutor(ExecutorContext *exec_ctx, const DeletePlanNode *plan,
@@ -26,6 +26,14 @@ void DeleteExecutor::Init() {
     //throw NotImplementedException("DeleteExecutor is not implemented");
     child_executor_->Init();
     auto table_oid = plan_->TableOid();
+    try{
+        bool is_success = exec_ctx_->GetLockManager()->LockTable(exec_ctx_->GetTransaction(), LockManager::LockMode::INTENTION_EXCLUSIVE, table_oid);
+        if(!is_success){
+            throw ExecutionException("fail lock table in delete");
+        }
+    }catch(TransactionAbortException &e){
+        exec_ctx_->GetTransactionManager()->Abort(exec_ctx_->GetTransaction());
+    }
     table_info_ = exec_ctx_->GetCatalog()->GetTable(table_oid);
     delete_rows_ = 0;
 
@@ -33,6 +41,14 @@ void DeleteExecutor::Init() {
     RID child_rid;
 
     while(child_executor_->Next(&child_tuple, &child_rid)){
+        try{
+            bool is_success = exec_ctx_->GetLockManager()->LockRow(exec_ctx_->GetTransaction(), LockManager::LockMode::EXCLUSIVE, table_oid, child_rid);
+            if(!is_success){
+                throw ExecutionException("fail lock row in delete");
+            }
+        }catch(TransactionAbortException &e){
+            exec_ctx_->GetTransactionManager()->Abort(exec_ctx_->GetTransaction());
+        }
         delete_rows_++;
         auto meta = table_info_->table_->GetTupleMeta(child_rid);
         meta.is_deleted_ = true;

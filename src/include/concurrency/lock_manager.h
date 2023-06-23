@@ -301,6 +301,13 @@ class LockManager {
   TransactionManager *txn_manager_;
 
  private:
+  auto GrandTableLock(Transaction *txn, std::shared_ptr<LockRequestQueue> queue, LockRequest* request) -> bool;
+  void CheckTableLock(Transaction *txn, LockMode lock_mode);
+  void CheckRowLock(Transaction *txn, LockMode lock_mode);
+  auto IsCompatible(Transaction *txn, LockMode lock_mode, table_oid_t oid) ->bool ;
+  auto IsLockUpgrade(Transaction *txn, std::shared_ptr<LockRequestQueue> queue, LockMode lock_mode, LockRequest** delete_request) -> bool;
+  void MayBeUpdateToShrinking(Transaction *txn, LockMode lock_mode);
+  auto hasCycle(txn_id_t first_txn_id, txn_id_t *txn_id) ->bool;
   /** Fall 2022 */
   /** Structure that holds lock requests for a given table oid */
   std::unordered_map<table_oid_t, std::shared_ptr<LockRequestQueue>> table_lock_map_;
@@ -316,6 +323,7 @@ class LockManager {
   std::thread *cycle_detection_thread_;
   /** Waits-for graph representation. */
   std::unordered_map<txn_id_t, std::vector<txn_id_t>> waits_for_;
+  std::unordered_map<txn_id_t , bool> visited_;
   std::mutex waits_for_latch_;
 };
 

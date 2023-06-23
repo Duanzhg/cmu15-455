@@ -46,8 +46,8 @@ auto TransactionManager::Begin(Transaction *txn, IsolationLevel isolation_level)
 
 void TransactionManager::Commit(Transaction *txn) {
   txn->SetState(TransactionState::COMMITTED);
-
-  // Perform all deletes before we commit.
+    //BUSTUB_ASSERT(txn->GetState()==TransactionState::COMMITTED,"#############======");
+    // Perform all deletes before we commit.
   auto write_set = txn->GetWriteSet();
   while (!write_set->empty()) {
     // auto &item = write_set->back();
